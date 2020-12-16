@@ -75,43 +75,6 @@ const postData = async ( url = '', data = {})=>{
     }
   };
 
-// export function performAction(event) {
-//   event.preventDefault()
-//   console.log('I\'m connected');
-//   const destCity = document.getElementById('city').value;
-//   console.log(`The city is ${destCity}`);
-//   const departureDate = document.getElementById('date-departure').value;
-//   const returnDate = document.getElementById('date-return').value;
-//   console.log(`The dates are ${departureDate} and ${returnDate}`);
-//   // join all the data info
-//   const theUserTrip = {destCity, departureDate, returnDate};
-//   console.log(theUserTrip);
-
-//   //postRoute(theUserTrip);
-//   const response = await postRoute(theUserTrip)
-//   const responseJSON = await response.json()
-//   const theCity = responseJSON.body;
-//   console.log(theCity);
-// };
-
-// async function postRoute(theUserTrip) {
-//   const response = await fetch('http://localhost:8000/postData', {
-//       method: 'POST',
-//       credentials: 'same-origin',
-//       headers: {
-//           'Content-Type': 'text/plain'
-//       },
-//       body: (theUserTrip)
-//   });
-
-//   try {
-//       const newData = await response.json();
-//       console.log(newData)
-//       return newData
-//     } catch (error) {
-//       console.log('error', error);
-//   }
-// };
 
 
 
