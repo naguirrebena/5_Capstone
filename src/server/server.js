@@ -184,6 +184,10 @@ app.get('http://localhost:8081/geonameData', (req, res) => {
 //   })
   
 
+app.get('/getNewTrip', (req, res) => {
+  console.log(tripData);
+  res.send(tripData);
+})
 
 
 app.post('/datastore', dataStorage)

@@ -35,47 +35,51 @@ export async function handleSubmit(event) {
         daysUntilTrip: daysUntilTrip
       });
     
-      await Client.getData('http://localhost:8081/geonameData')
-      await Client.getData('http://localhost:8081/weatherBit')
-      await Client.getData('http://localhost:8081/pixabay')
-      await Client.updateUI('http://localhost:8081/all')
+      await getData('http://localhost:8081/geonameData')
+      await getData('http://localhost:8081/weatherBit')
+      await getData('http://localhost:8081/pixabay')
 
+      const getTripData = await getData('http://localhost:8081/getNewTrip');
 
+      console.log(getTripData);
+      updateUI(getTripData)
 
 }
 
-const postData = async ( url='', data={})=>{
-    const response = await fetch(url, {
-      method: 'POST',
-      mode: 'cors',
-      credentials: 'same-origin',
-      headers:{
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    });
-    try {
-        const newData = await response.json();
-        console.log(newData);
-        return newData;
-      } catch (error) {
-        console.log('error', error)
-      }
-    }
+async function postData(url, tripData){
+  const response = await fetch(url, {
+    method: 'POST',
+    mode: 'cors',
+    credentials: 'same-origin',
+    headers:{
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(tripData)
+  });
+}
 
-const Client.getData = async (url) => {
-    const response = await fetch(url);
-    try {
-      const data = await response.json();
-      console.log(data);
+const getData = async(url) => {
+const asyncParams = {
+  method: 'GET',
+  mode: 'cors',
+  headers: {
+      'Content-Type': 'application/json;charset=utf-8'
+  }
+};
+
+  const res = await fetch(url, asyncParams);
+    try{
+      const data = await res.json();
       return data;
-    } catch (error) {
-      console.log('error', error)
+    } 
+    catch {
+      console.log(`Error: ${res.statusText}`)
     }
-  };
+}
+
  
 
-export const CLient.updateUI = async (url) => {
+export const updateUI = async (url) => {
     const response = await fetch(url);
     try {
       const data = await response.json();
