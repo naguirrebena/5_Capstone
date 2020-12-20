@@ -37,12 +37,12 @@ async function handleSubmit(event) {
       const startDate = new Date(departureDate);
       const endDate = new Date(returnDate);
        
-      // Calculates duration
+
       const travelTime = endDate.getTime() - startDate.getTime();
       const daysTravelling = timeUnitConversion(travelTime);
       console.log(daysTravelling);
   
-      // Calculates days from today until trip
+
       const timeUntilTrip = startDate.getTime() - today;
       const daysUntilTrip = timeUnitConversion(timeUntilTrip) + 1;
       console.log(daysUntilTrip);
@@ -52,7 +52,6 @@ async function handleSubmit(event) {
         tripDestination, 
         departureDate, 
         returnDate, 
-        timeUntilTrip, 
         daysUntilTrip, 
         daysTravelling }
     console.log(tripData)
@@ -64,7 +63,8 @@ async function handleSubmit(event) {
             errorMessage.innerHTML = "Couldn't connect to server. Try again later."
         return null
          }   
-        console.log(geonamesData)
+         bigData["cityData"] = Client.extractCityData(geonamesData)
+         console.log(bigData.cityData)
 
 
         const weatherbitData = await callServer('callWeather', tripData)
@@ -105,17 +105,14 @@ async function callServer(url, newtripData){
             headers: {
                 'Content-Type': 'application/json'
             },
-            // Body data type must match "Content-Type" header        
             body: JSON.stringify(newtripData)
         })
-        // Return null if server route was not found
         if (!response.correct) {
             console.log(`Error connecting to http://localhost:8081/${url}. Response status ${response.status}`)
             return null
         }
         const responseJSON = await response.json()
         return responseJSON
-        // Return null if can't connect to server at all (eg. it's turned off)
     } catch (error) {
         console.log(`Error connecting to server: ${error}`)
         return null
@@ -128,7 +125,6 @@ function updateUI() {
     document.getElementById('departure').innerHTML = details.departureDate;
     document.getElementById('return').innerHTML = details.returnDate;
     document.getElementById('trip_duration').innerHTML = details.daysTravelling;
-
 
 }
 
