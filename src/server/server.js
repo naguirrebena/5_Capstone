@@ -1,21 +1,21 @@
 const dotenv = require('dotenv')
 dotenv.config()
 
-// Geonames API and URL
-const geoNamesURL = 'http://api.geonames.org/searchJSON?q=';
-const geoNamesUsername = `&username=${process.env.GEONAME_USERNAME}`;
+// // Geonames API and URL
+// const geoNamesURL = 'http://api.geonames.org/searchJSON?q=';
+// const geoNamesUsername = `&username=${process.env.GEONAME_USERNAME}`;
 
-// Weatherbit API and URL
-const weatherBitURL = 'http://api.weatherbit.io/v2.0/forecast/daily?';
-const weatherBitKey = `&key=${process.env.WEATHERBIT_API_KEY}`;
-const weatherBitParams = "&units="
-// Pixabay API and URL
-const pixaBayURL = 'https://pixabay.com/api/?q='; 
-const pixaBayKey = `&key=${process.env.PIXABAY_KEY}`;
-const pixaBayParams = "&image_type=photo&orientation=horizontal";
+// // Weatherbit API and URL
+// const weatherBitURL = 'http://api.weatherbit.io/v2.0/forecast/daily?';
+// const weatherBitKey = `&key=${process.env.WEATHERBIT_API_KEY}`;
+// const weatherBitParams = "&units="
+// // Pixabay API and URL
+// const pixaBayURL = 'https://pixabay.com/api/?q='; 
+// const pixaBayKey = `&key=${process.env.PIXABAY_KEY}`;
+// const pixaBayParams = "&image_type=photo&orientation=horizontal";
 
-// Rest Countries API
-const restCountriesURL = 'https://restcountries.eu/rest/v2/lang/';
+// // Rest Countries API
+// const restCountriesURL = 'https://restcountries.eu/rest/v2/lang/';
 
 const path = require('path');
 const fetch = require('node-fetch'); 
@@ -34,11 +34,21 @@ app.use(express.static('dist'));
 
 module.exports = app;
 
-app.listen(8081, function () {
-    console.log('App running on port 8081')
-})
+const port = 8081;
+const server = app.listen(port, listening);
+
+// Callback to degug
+function listening() {
+  console.log("server running");
+  console.log(`running on localhost ${port}`);
+}
 
 let tripData = {};
+
+app.get('/all', (req, res) => {
+    console.log(tripData);
+    res.send(tripData);
+})
 
 app.get('/', function (req, res) {
     res.sendFile('dist/index.html')
@@ -50,75 +60,129 @@ app.get('/test', function(req, res) {
     })
   })
 
-app.post('/callgeoNames', callgeoNames)
-
-async function callgeoNames(req, res) {
-    const geonamesUrl = `${geoNamesURL}${addPlus(req.body.details.tripDestination)}${geoNamesUsername}`;
-    try {
-        const response = await fetch(geonamesUrl)
-        tripData['long'] = response.geonames[0].lng;
-        tripData['lat'] = response.geonames[0].lat;
-        const responseJSON = await response.json()
-        res.send(responseJSON)
-    } catch (error) {
-        console.log(`Error connecting to API.`)
-        res.send(null)
+  app.post('/newTrip', (req, res) => {
+    let newData = req.body;
+    let newEntry = {
+      location: newData.Location,
+      startDate: newData.Start,
+      endDate: newData.End,
+      duration: newData.Duration,
+      daysToTrip: newData.DaysToGo
     }
-}
+    
+    tripData = newEntry;
+    console.log(tripData)
+    res.send('ok');
+})
 
-app.post('/callWeather', callWeather)
 
-async function callWeather(req, res) {
-    const weatherbitUrl = `${weatherBitURL}lat=${req.body.details.lat}&lon=${req.body.details.long}${weatherBitKey}${weatherBitParams}`;
-    try {
-        const response = await fetch(weatherbitUrl)
-        tripData.weatherDesc = data.weather.description;
-        const responseJSON = await response.json()
-        res.send(responseJSON)
-    } catch (error) {
-        console.log(`Error connecting to API.`)
-        res.send(null)
-    }
-}
+app.get('http://localhost:8081/geonameData', (req, res) => {
 
-app.post('/callPixabay', callPhotos)
+    console.log('GET geonames');
+    const url = `http://api.geonames.org/searchJSON?placename=${tripData.location}&maxRows=1&username=${process.env.GEONAME_USERNAME}`
+    console.log(url);
+    getData(url).then(response => {
+      console.log('Data from Genames[0]')
+      console.log(response.geonames[0]);
+      tripData.lat = response.geonames[0].lat;
+      tripData.long = response.geonames[0].lng;
+      
+      console.log(`TripData is, ${tripData}`);
+      res.send(true);
+    }).catch(error => {
+      res.send(JSON.stringify({error: error}))
+    })
+    
+  })
+//     console.log('GET geonames');
+//     const url = `http://api.geonames.org/searchJSON?placename=${tripData.location}&maxRows=1&username=${process.env.GEONAME_USERNAME}`;
+//   console.log(url);
+//     fetch(url)
+//       .then(res => res.json())
+//         .then(response =>{
+//           try {
+//             console.log('Data From GeoNames')
+//             console.log(response.geonames[0]);
+//             tripData['long'] = response.geonames[0].lng;
+//             tripData['lat'] = response.geonames[0].lat;
+//             tripData['code'] = response.geonames[0].countryCode;
+//             res.send(true);
+//           } catch (e) {
+//             console.log("Error: ", e);
+//           }
+//     })
+//     .catch(error => {
+//       res.send(JSON.stringify({error: error}));
+//     })
+//   })
+  
+  app.get('http://localhost:8081/weatherBit', (req, res) => {
+    console.log('GET weatherBit');
+    const url = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${tripData.lat}&lon=${tripData.long}&key=${process.env.WEATHERBIT_API_KEY}`
+    console.log(url);
+    getData(url).then(response => {
+      console.log('Data from weatherBit');
+      const weatherData = response.data;
+  
+      weatherData.forEach((data) => {
+        if (data.valid_date == tripData.startDate) {
+          tripData.description = data.weather.desc;
+          triptData.temp = data.temp;
+          console.log(tripData);
+          res.send(true);
+        } else return
+      })
+    })
+  })
 
-async function callPhotos(req, res) {
-    const pixabayUrl = `${pixaBayURL}+${req.body.details.tripLocation}+${pixaBayKey}+${pixaBayParams}`;
-    try {
-        const response = await fetch(pixabayUrl)
-        const cityArray = [];
-        const result1 = response.hits[0].webformatURL;
-        const result2 = response.hits[1].webformatURL;
-        const result3 = response.hits[2].webformatURL;
+//     console.log('GET weather');
+//     const url = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${tripData.lat}&lon=${tripData.long}&key=${process.env.WEATHERBIT_API_KEY}`;
+//     console.log(url);
+//       fetch(url)
+//         .then(response => response.json())
+//           .then(response =>{
+//             let forecastDay = tripData.daysToTrip;
+//             const data = response.data[forecastDay]
+//             console.log(data)
+//             tripData.maxTemp = data.max_temp;
+//             tripData.minTemp = data.min_temp;
+//             tripData.weatherDesc = data.weather.description
 
-        cityArray.push(result1);
-        cityArray.push(result2);
-        cityArray.push(result3);
-        planData.cityArray = cityArray
-        res.send(true);
-        const responseJSON = await response.json()
-        res.send(responseJSON)
-    } catch (error) {
-        console.log(`Error connecting to API.`)
-        res.send(null)
-    }
-}
+//             res.send(true)
+//       })
+//       .catch(error => {
+//         res.send(JSON.stringify({error: "An error occured"}));
+//       })
+//   })
+  
+  app.get('http://localhost:8081//pixabay', (req, res) => {
+    console.log('GET pixabay');
+  const url = `https://pixabay.com/api/?&key=${process.env.PIXABAY_KEY}&q=${tripData.location}&image_type=photo`
+  console.log(url);
+  getData(url).then(response => {
+    console.log("Data from pixabay");
+    tripData.img = response.hits[0].webformatURL;
+    console.log(tripData);
+    res.send(true);
+  })
+})
 
-app.post('/callCountries', callLanguage)
-
-async function callLanguage(req, res) {
-    const restCountriesUrl = `${restCountriesURL}${req.body.details.code}`;
-    try {
-        const response = await fetch(restCountriesUrl)
-        tripData['languages'] = response.languages[0].name
-        const responseJSON = await response.json()
-        res.send(responseJSON)
-    } catch (error) {
-        console.log(`Error connecting to API.`)
-        res.send(null)
-    }
-}
+//     console.log('GET Image')
+//     const url = `https://pixabay.com/api/?&key=${process.env.PIXABAY_KEY}&q=${tripData.location}&image_type=photo`;
+//     console.log(url);
+//       fetch(url)
+//         .then(response => response.json())
+//           .then(response =>{
+//             console.log("Pixabay data");
+//             tripData.img = response.hits[0].webformatURL;
+//             console.log(tripData);
+//             res.send(true);
+//           })
+//           .catch(error => {
+//             res.send(JSON.stringify({error: "An error has occured"}));
+//           })
+//   })
+  
 
 
 
@@ -129,11 +193,3 @@ function dataStorage(req, res) {
     console.log(tripData)
     res.send({ message: "Data stored" })
 }
-
-
-
-
-
-
-
-

@@ -1,148 +1,96 @@
 
 
-async function handleSubmit(event) {
+export async function handleSubmit(event) {
     event.preventDefault();
     console.log('Submit event working')
 
-    const errorMessage = document.getElementById('error_message')
-    errorMessage.innerHTML = ""
-    document.getElementById('trip_destination').innerHTML = ""
-    document.getElementById('departure_date').innerHTML = ""
-    document.getElementById('return_date').innerHTML = ""
-    
-
-      const tripDestination = document.getElementById('trip_destination').value
-      console.log(`City: ${tripDestination}`)
-      if (tripDestination == "") {
-          errorMessage.innerHTML = "Please enter a destination"
-        return
-      }
+      const destination = document.getElementById('trip_destination').value;
+      const departureDate = document.getElementById('departure_date').value;
+      const returnDate = document.getElementById('return_date').value;
       
-      const departureDate = document.getElementById('departure_date').value
-      if (departureDate == "") {
-          errorMessage.innerHTML = "Enter departure date"
-          return
-      }
-      console.log(`Departure date: ${departureDate}`)
-  
-      
-      const returnDate = document.getElementById('return_date').value
-      if (returnDate == "") {
-          errorMessage.innerHTML = "Enter return date"
-          return
-      }
-      console.log(`Return date: ${returnDate}`)
 
-      const today = new Date();
       const startDate = new Date(departureDate);
       const endDate = new Date(returnDate);
-       
 
-      const travelTime = endDate.getTime() - startDate.getTime();
-      const daysTravelling = timeUnitConversion(travelTime);
+      const currentDate = new Date();
+      const newDate = currentDate.getMonth() + "-" + currentDate.getDate() + "-" + currentDate.getFullYear();
+      console.log(`newDate: ${newDate}`)
+
+      const tripDuration = endDate.getTime() - startDate.getTime();
+      const daysTravelling = tripDuration / (1000 * 3600 * 24);
       console.log(daysTravelling);
   
-
-      const timeUntilTrip = startDate.getTime() - today;
-      const daysUntilTrip = timeUnitConversion(timeUntilTrip) + 1;
+      const timeUntilTrip = startDate.getTime() - currentDate.getTime();
+      const daysUntilTrip = Math.round(timeUntilTrip / (1000 * 3600 * 24));
       console.log(daysUntilTrip);
 
-    let tripData = {}
-    tripData = { 
-        tripDestination, 
-        departureDate, 
-        returnDate, 
-        daysUntilTrip, 
-        daysTravelling }
-    console.log(tripData)
+    //   const travelCard = document.getElementById('travel-card');
+    //   const travelResults = document.getElementById('travel-results');
+
+    await postData('http://localhost:8081/newTrip', {
+        location: destination,
+        startDate: startDate,
+        endDate: endDate,
+        duration: daysTravelling,
+        daysUntilTrip: daysUntilTrip
+      });
+    
+      await Client.getData('http://localhost:8081/geonameData')
+      await Client.getData('http://localhost:8081/weatherBit')
+      await Client.getData('http://localhost:8081/pixabay')
+      await Client.updateUI('http://localhost:8081/all')
 
 
-        const geonamesData = await callServer('callgeoNames', tripData)
-        if (geonamesData == null) {
-            errorMessage.innerHTML = "Couldn't connect to server. Try again later."
-        return null
-         }   
-         console.log(bigData.cityData)
-
-
-        const weatherbitData = await callServer('callWeather', tripData)
-        if (weatherbitData == null) {
-            errorMessage.innerHTML = "Couldn't connect to server. Try again later."
-            return null
-        }
-        console.log(weatherbitData)
-
-     
-        const photoData = await callServer('callPhotos', tripData)
-        if (photoData == null) {
-            errorMessage.innerHTML = "Couldn't connect to server. Try again later."
-            return null
-        }
-        console.log(photoData)
-
-        const countryData = await callServer('callLanguage', tripData)
-        if (countryData == null) {
-            errorMessage.innerHTML = "Couldn't connect to server. Try again later."
-            return null
-        }
-        console.log(countryData)
-
-        const getDataTrip = await callServer('http://localhost:8081/tripDetails')
-        console.log(getDataTrip);
-
-        updateUI(getDataTrip)
 
 }
-  
 
-async function callServer(url, tripData){
+const postData = async ( url='', data={})=>{
+    const response = await fetch(url, {
+      method: 'POST',
+      mode: 'cors',
+      credentials: 'same-origin',
+      headers:{
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
     try {
-        const response = await fetch(url, {
-            method: 'POST',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(tripData)
-        })
-        if (!response.correct) {
-            console.log(`Error`)
-            return null
-        }
-        const responseJSON = await response.json()
-        return responseJSON
+        const newData = await response.json();
+        console.log(newData);
+        return newData;
+      } catch (error) {
+        console.log('error', error)
+      }
+    }
+
+const Client.getData = async (url) => {
+    const response = await fetch(url);
+    try {
+      const data = await response.json();
+      console.log(data);
+      return data;
     } catch (error) {
-        console.log(`Error connecting to server: ${error}`)
-        return null
+      console.log('error', error)
     }
-}
+  };
+ 
 
-function updateUI() {
-
-    document.getElementById('destination').innerHTML = details.tripDestination;
-    document.getElementById('departure').innerHTML = details.departureDate;
-    document.getElementById('return').innerHTML = details.returnDate;
-    document.getElementById('trip_duration').innerHTML = details.daysTravelling;
-
-}
-
-
-
-function checkLocalStorage(event) {
-    if (localStorage.tripData) {
-        const tripData = JSON.parse(localStorage.getItem('tripData'))
-        Client.updateUI(tripData)
+export const CLient.updateUI = async (url) => {
+    const response = await fetch(url);
+    try {
+      const data = await response.json();
+      document.getElementById("destination_image").src = data.img;
+      document.getElementById("destination").innerHTML = `${data.location}`
+      document.getElementById("departure").innerHTML = `${data.startDate}`
+      document.getElementById("return").innerHTML = `${data.endDate}`
+      document.getElementById("trip_duration").innerHTML = `${data.duration} days`
+      document.getElementById("trip-start").innerHTML = `${data.daysToTrip} days from now`
+      document.getElementById("days_left").innerHTML = `${data.temp}°F`
+      document.getElementById("weather_desc").innerHTML = `${data.description}`
+    } catch (error) {
+      console.log("error", error);
     }
-}
-
-function clearLocalStorage(event) {
-    localStorage.clear()
-    location.reload()
-}
-
-const timeUnitConversion = (timeInMilliseconds) => {
-    let timeInDays = timeInMilliseconds/(1000 * 60 * 60 * 24);
-    return Math.ceil(timeInDays);
-  }
-
-export { handleSubmit, callServer, updateUI, checkLocalStorage, clearLocalStorage }
+  };
+  
+  
+  

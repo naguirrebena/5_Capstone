@@ -26,7 +26,7 @@
           <div id="travel_app_title">
               <h3>Plan your next trip</h3>
           </div>
-          <form id="create-new-trip" class="form-new-trip" onsubmit="return CLient.handleSubmit(event)">
+          <form id="create_new_trip" class="form_new_trip">
             <label for="destination">To</label>
             <input id="trip_destination" name="destination" type="text" placeholder="Enter city" required>
             <label for="departure_date">Departure</label>
@@ -35,38 +35,36 @@
             <input id="return_date" name="return_date" type="date" required>
             </div>
             <div id="error_message" class="error_message"></div>
-            <input type="submit" class="button" id="button_submit" name="" value="Submit" onclick="return Client.handleSubmit(event)" onsubmit="return Client.handleSubmit(event)">
-            <input type="submit" id="button_clear" class="button" value="Clear Form">
-          </form>
+            <input type="submit" class="button" id="button_submit" name="" value="Submit">
+            <!-- <input type="submit" id="button_delete" class="button" value="Refresh"> -->
+        </form>
     </section>
 
       <section class="trip_plan" id="trip_plan">
                 <div class="date-info">
                     <h4>Trip Information:</h4>
-                    <p id="destination_result">Destination: <span id="destination"></span></p>
-                    <p id="departure_date_result">Departure Date: <span id="departure"></span></p>
-                    <p id="return_date_result">Return Date: <span id="return"></span></p>
+                    <p id="departure_result">Departure Date: <span id="departure"></span></p>
+                    <p id="return_result">Return Date: <span id="return"></span></p>
                     <p id="days_left_result">Days Until Trip: <span id="days_left"></span> Days</p>
-                    <p id="trip_duration_result">Trip Duration: <span id="trip_duration"></span> Days</p>
+                    <p id="duration_result">Trip Duration: <span id="duration"></span> Days</p>
                 </div>
                 <div id="more-info">
                     <h4>More information about your destination:</h4>
-                    <p id="weather_description">Weather Description: <span id="weather_desc"></span></p>
+                    <p id="destination_result">City: <span id="destination"></span></p>
+                    <p id="weather_result">Weather Description: <span id="weather"></span></p>
                     <p id="languages_result">Official Language(s): <span id="languages"></span></p>
+                    <p id="country_result">Country: <span id="country"></span></p>
                 </div>
               <div id="image-info">
                   <h4>Destination Images:</h4>
                   <div id="pixabay-img">
-                      <img alt="city_img_1" id="img1">
-                      <img alt="city_img_2" id="img2">
-                      <img alt="city_img_3" id="img3">
+                      <img alt="city_img" id="destination_image">
                   </div>
               </div>
-              <div class="print">
-                <button class="button" id="printBTN" href="#">Print</button>
-                <button type="submit" id="deleteBTN" class="button" value="Clear Data">Clear Data</button>
-              </div>
-          
+              <div class="print_delete">
+                <button id="print" class="button" href="#">Print</a>
+                <button id="delete" class="button" href="#">Delete</a>
+            </div>
   </section>
 </section>
 </main>
@@ -79,12 +77,12 @@
 
 </container>
 <script>
-  // Check that service workers are supported
-  if ('serviceWorker' in navigator) {
-      // Use the window load event to keep the page load performant
-      window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js');
-      })};
+//   // Check that service workers are supported
+//   if ('serviceWorker' in navigator) {
+//       // Use the window load event to keep the page load performant
+//       window.addEventListener('load', () => {
+//           navigator.serviceWorker.register('/service-worker.js');
+//       })};
   
   
   
