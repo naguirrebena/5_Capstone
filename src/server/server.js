@@ -120,10 +120,7 @@ async function callLanguage(req, res) {
     }
 }
 
-app.get('/tripDetails', (req, res) => {
-    console.log(tripData);
-    res.send(tripData);
-})
+
 
 app.post('/datastore', dataStorage)
 
