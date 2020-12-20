@@ -25,7 +25,7 @@ async function handleSubmit(event) {
       }
       console.log(`Departure date: ${departureDate}`)
   
-
+      
       const returnDate = document.getElementById('return_date').value
       if (returnDate == "") {
           errorMessage.innerHTML = "Enter return date"
@@ -47,7 +47,17 @@ async function handleSubmit(event) {
       const daysUntilTrip = timeUnitConversion(timeUntilTrip) + 1;
       console.log(daysUntilTrip);
 
-        let tripData = {}
+    let tripData = {}
+    tripData = { 
+        tripDestination, 
+        departureDate, 
+        returnDate, 
+        timeUntilTrip, 
+        daysUntilTrip, 
+        daysTravelling }
+    console.log(tripData)
+
+    
 
         const geonamesData = await callServer('callgeoNames', tripData)
         if (geonamesData == null) {
