@@ -1,10 +1,29 @@
-# Weather-Journal App Project
+# Travel App
 
-## Overview
-This project requires you to create an asynchronous web app that uses Web API and user data to dynamically update the UI. 
+Traveller app which gives information about the destination you want to travel and help you plan your trip better.
 
-## Instructions
-This will require modifying the `server.js` file and the `website/app.js` file. You can see `index.html` for element references, and once you are finished with the project steps, you can use `style.css` to style your application to customized perfection.
+ ## Getting Started
+ Download or clone the project
 
-## Extras
-If you are interested in testing your code as you go, you can use `tests.js` as a template for writing and running some basic tests for your code.
+ Install dependencies
+```
+   npm install --save-dev
+```
+Start the server
+```
+   npm start
+```
+Setup the environment development or production
+```
+   npm run build-dev
+```
+or 
+```
+npm run build-prod
+```
+Test with Jest
+```
+npm run test
+```
+Test cases are created using Jest.
+server is running on  http://localhost:8081
