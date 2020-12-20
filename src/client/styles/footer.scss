@@ -1,0 +1,22 @@
+.footer {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0em 1em 0em 1em;
+}
+
+.footer_author {
+    font-size: 18px;
+    color: white;
+    padding: 8px;
+}
+
+.footer_social {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.social_media_icons{
+    padding: 1em;
+}

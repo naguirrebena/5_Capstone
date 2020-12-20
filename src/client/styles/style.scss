@@ -1,109 +1,54 @@
-body{
-    background: #fffff8;
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100&display=swap");
+@import './header.scss';
+@import './main.scss';
+@import './footer.scss';
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+body {
+    font-family: "Roboto", sans-serif;
+    text-align: center;
+    font-size: 14px;
+    background: #baa6a5;
+    position: relative;
+    line-height: 1.4;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    margin: 0px;
 }
 
-#app{
-    display: grid;
-    height:130vh;
-    background: #d1d1d1;
-    color: #860350;
-    justify-content: center;
-    grid-gap: 1em;
-    font-size: 20px;
-    font-family: 'Oswald', sans-serif;
+.container {
+    max-width: 1200px;
+    padding: 1rem;
+    margin: 0 auto;
 }
 
-.holder{
-
+nav ul li {
+    list-style: none;
 }
 
-.entry{
-    background: rgba(59, 74, 107, .4);
+a {
+    text-decoration: none;
+    color: white;
+    cursor: pointer;
 }
 
-#entryHolder{
-
+a:hover {
+    color: #e6e0cf;
 }
 
-#date{
-
+img {
+    width: 100%;
 }
 
-#temp{
-
+@media (min-width: 600px) {
+    body {
+        font-size: 16px;
+    }
 }
 
-#content{
-
-}
-
-.headline {
-
-}
-.title{
-
-}
-
-/*  Basic Styling To Override Default For Basic HTML Elements */
-label{
-    display:block;
-    font-size: 27px;
-}
-
-input{
-    display:block;
-    height: 60px;
-    width: 320px;
-    background:#22b2da;
-    color: #f0d43a;
-    font-size: 20px;
-    font-family: 'Oswald', sans-serif;
-    border: none;
-}
-
-button{
-    width: 400px;
-    height: 100px;
-    background: #3b4a6b;
-    color: #f0d43a;
-    font-size: 26px;
-    font-family: 'Oswald', sans-serif;
-    border: none;
-    box-shadow: 2px 4px 5px #444;
-}
-h1{
-    font-size: 36px;
-}
-
-textarea{
-    background:#22b2da;
-    color: #f0d43a;
-    font-size: 20px;
-    font-family: 'Oswald', sans-serif;
-}
-/* Reset style for HTML element on active to have no border*/
-input:focus,
-select:focus,
-textarea:focus,
-button:focus {
-    outline: none;
-}
-/* Style for Placeholder Text*/
-::placeholder { /* Firefox, Chrome, Opera */ 
-    color: #f0d43a; 
-    font-family: 'Oswald', sans-serif;
-
-} 
-  
-:-ms-input-placeholder { /* Internet Explorer 10-11 */ 
-    color: #f0d43a; 
-    font-family: 'Oswald', sans-serif;
-
-} 
-  
-::-ms-input-placeholder { /* Microsoft Edge */ 
-    color: #f0d43a; 
-    font-family: 'Oswald', sans-serif;
-
-} 
