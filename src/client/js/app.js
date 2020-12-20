@@ -56,14 +56,12 @@ async function handleSubmit(event) {
         daysTravelling }
     console.log(tripData)
 
-    
 
         const geonamesData = await callServer('callgeoNames', tripData)
         if (geonamesData == null) {
             errorMessage.innerHTML = "Couldn't connect to server. Try again later."
         return null
          }   
-         bigData["cityData"] = Client.extractCityData(geonamesData)
          console.log(bigData.cityData)
 
 
@@ -89,7 +87,7 @@ async function handleSubmit(event) {
         }
         console.log(countryData)
 
-        const getDataTrip = await callServer('http://localhost:8080/tripDetails')
+        const getDataTrip = await callServer('http://localhost:8081/tripDetails')
         console.log(getDataTrip);
 
         updateUI(getDataTrip)
@@ -97,18 +95,18 @@ async function handleSubmit(event) {
 }
   
 
-async function callServer(url, newtripData){
+async function callServer(url, tripData){
     try {
-        const response = await fetch(`http://localhost:8081/${url}`, {
+        const response = await fetch(url, {
             method: 'POST',
             credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(newtripData)
+            body: JSON.stringify(tripData)
         })
         if (!response.correct) {
-            console.log(`Error connecting to http://localhost:8081/${url}. Response status ${response.status}`)
+            console.log(`Error`)
             return null
         }
         const responseJSON = await response.json()
