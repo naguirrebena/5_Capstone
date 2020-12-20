@@ -15,7 +15,7 @@ const pixaBayKey = `&key=${process.env.PIXABAY_KEY}`;
 const pixaBayParams = "&image_type=photo&orientation=horizontal";
 
 // Rest Countries API
-const restCountriesUrl = 'https://restcountries.eu/rest/v2/lang/';
+const restCountriesURL = 'https://restcountries.eu/rest/v2/lang/';
 
 const path = require('path');
 const fetch = require('node-fetch'); 
@@ -56,8 +56,8 @@ async function callgeoNames(req, res) {
     const geonamesUrl = `${geoNamesURL}${addPlus(req.body.details.tripDestination)}${geoNamesUsername}`;
     try {
         const response = await fetch(geonamesUrl)
-        const longitude = geonamesData.geonames[0].lng
-        const latitude = geonamesData.geonames[0].lat
+        tripData['long'] = response.geonames[0].lng;
+        tripData['lat'] = response.geonames[0].lat;
         const responseJSON = await response.json()
         res.send(responseJSON)
     } catch (error) {
@@ -72,6 +72,7 @@ async function callWeather(req, res) {
     const weatherbitUrl = `${weatherBitURL}lat=${req.body.details.lat}&lon=${req.body.details.long}${weatherBitKey}${weatherBitParams}`;
     try {
         const response = await fetch(weatherbitUrl)
+        tripData.weatherDesc = data.weather.description;
         const responseJSON = await response.json()
         res.send(responseJSON)
     } catch (error) {
@@ -83,9 +84,19 @@ async function callWeather(req, res) {
 app.post('/callPixabay', callPhotos)
 
 async function callPhotos(req, res) {
-    const pixabayUrl = `${pixaBayURL}+${req.body.details.tripLocation}+${pixaBayParams}`;
+    const pixabayUrl = `${pixaBayURL}+${req.body.details.tripLocation}+${pixaBayKey}+${pixaBayParams}`;
     try {
         const response = await fetch(pixabayUrl)
+        const cityArray = [];
+        const result1 = response.hits[0].webformatURL;
+        const result2 = response.hits[1].webformatURL;
+        const result3 = response.hits[2].webformatURL;
+
+        cityArray.push(result1);
+        cityArray.push(result2);
+        cityArray.push(result3);
+        planData.cityArray = cityArray
+        res.send(true);
         const responseJSON = await response.json()
         res.send(responseJSON)
     } catch (error) {
@@ -100,6 +111,7 @@ async function callLanguage(req, res) {
     const restCountriesUrl = `${restCountriesURL}${req.body.details.code}`;
     try {
         const response = await fetch(restCountriesUrl)
+        tripData['languages'] = response.languages[0].name
         const responseJSON = await response.json()
         res.send(responseJSON)
     } catch (error) {
