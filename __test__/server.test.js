@@ -1,11 +1,18 @@
-const app = require('../src/server/server')
+
+
+const app = require('../src/server/server.js')
 const supertest = require('supertest')
 const request = supertest(app)
 
-describe("Endpoint test", () => {
-    it('/test', async (done) => {
-        const response = await request.get('/test');
-        expect(response.status).toBe(200);
-        done();
-      });
-    });
+describe("Tests the storeData function", () => {
+
+    it("returns a message to confirm storage", async () => {
+        const response = await request.post('/storedata', "testData")
+        expect(response.body.message).toBe("Data received and stored")
+    })
+
+    it("confirms status 200", async () => {
+        const response = await request.post('/storedata', "testData")
+        expect(response.status).toBe(200)
+    })
+})
