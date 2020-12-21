@@ -1,5 +1,8 @@
 
 
+    const tripDetails = document.getElementById('trip_details');
+    const tripPlan = document.getElementById('trip_plan');
+
 export async function handleSubmit(event) {
     event.preventDefault();
     console.log('Submit event working')
@@ -8,93 +11,84 @@ export async function handleSubmit(event) {
       const departureDate = document.getElementById('departure_date').value;
       const returnDate = document.getElementById('return_date').value;
       
+    const currentDate = new Date();
+   const startDate = new Date(departureDate);
+   const endDate = new Date(returnDate);
 
-      const startDate = new Date(departureDate);
-      const endDate = new Date(returnDate);
+   const travelTime = endDate.getTime() - startDate.getTime();
+   const daysTravelling =  travelTime / (1000 * 3600 * 24);
+   console.log(daysTravelling);
 
-      const currentDate = new Date();
-      const newDate = currentDate.getMonth() + "-" + currentDate.getDate() + "-" + currentDate.getFullYear();
-      console.log(`newDate: ${newDate}`)
+   const timeUntilTrip = startDate.getTime() - currentDate.getTime();
+   const daysUntilTrip = Math.round(timeUntilTrip / (1000 * 3600 * 24));
+   console.log(daysUntilTrip);
 
-      const tripDuration = endDate.getTime() - startDate.getTime();
-      const daysTravelling = tripDuration / (1000 * 3600 * 24);
-      console.log(daysTravelling);
+
+
+  await postData('http://localhost:8081/newTrip', {
+      Location: destination,
+      Start: startDate,
+      End: endDate,
+      Duration: daysTravelling,
+      TimeUntilTravel: daysUntilTrip
+    })
   
-      const timeUntilTrip = startDate.getTime() - currentDate.getTime();
-      const daysUntilTrip = Math.round(timeUntilTrip / (1000 * 3600 * 24));
-      console.log(daysUntilTrip);
+    await getData('http://localhost:8081/geonamesData')
+    await getData('http://localhost:8081/weatherBit')
+    await getData('http://localhost:8081/pixabay')
 
-    //   const travelCard = document.getElementById('travel-card');
-    //   const travelResults = document.getElementById('travel-results');
+    const getTripData = await getData(`http://localhost:8081/all`);
 
-    await postData('http://localhost:8081/newTrip', {
-        location: destination,
-        startDate: startDate,
-        endDate: endDate,
-        duration: daysTravelling,
-        daysUntilTrip: daysUntilTrip
-      });
-    
-      await getData('http://localhost:8081/geonameData')
-      await getData('http://localhost:8081/weatherBit')
-      await getData('http://localhost:8081/pixabay')
-
-      const getTripData = await getData('http://localhost:8081/getNewTrip');
-
-      console.log(getTripData);
-      updateUI(getTripData)
+    console.log(getTripData);
+    updateUI(getTripData)
 
 }
 
-async function postData(url, tripData){
+const postData = async ( url='', data={})=>{
   const response = await fetch(url, {
-    method: 'POST',
-    mode: 'cors',
-    credentials: 'same-origin',
-    headers:{
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(tripData)
-  });
-}
+      method: 'POST',
+      mode: 'cors',
+      credentials: 'same-origin',
+      headers:{
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    try {
+        const newData = await response.json();
+        console.log(newData);
+        return newData;
+      } catch (error) {
+        console.log('error', error);
+      }
+    }
 
-const getData = async(url) => {
-const asyncParams = {
-  method: 'GET',
-  mode: 'cors',
-  headers: {
-      'Content-Type': 'application/json;charset=utf-8'
+    const getData = async (url) => {
+      const response = await fetch(url);
+      try {
+        const data = await response.json();
+        console.log(data);
+        return data;
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+
+export const updateUI = async () =>{
+  const request = await fetch('/all');
+  console.log(request)
+  try {
+    const allData = await request.json()
+  document.getElementById('destination').innerHTML = allData.location;
+  document.getElementById('departure').innerHTML = allData.startDate;
+  document.getElementById('return').innerHTML = allData.endDate;
+  document.getElementById('duration').innerHTML = allData.duration;
+  document.getElementById('days_left').innerHTML = allData.daysToTrip;
+  document.getElementById('weather').innerHTML = allData.weatherDesc;
+  document.getElementById('destination_image').innerHTML = allData.img;
+
+  }  catch(error) {
+    console.log("error", error);
   }
 };
 
-  const res = await fetch(url, asyncParams);
-    try{
-      const data = await res.json();
-      return data;
-    } 
-    catch {
-      console.log(`Error: ${res.statusText}`)
-    }
-}
-
- 
-
-export const updateUI = async (url) => {
-    const response = await fetch(url);
-    try {
-      const data = await response.json();
-      document.getElementById("destination_image").src = data.img;
-      document.getElementById("destination").innerHTML = `${data.location}`
-      document.getElementById("departure").innerHTML = `${data.startDate}`
-      document.getElementById("return").innerHTML = `${data.endDate}`
-      document.getElementById("trip_duration").innerHTML = `${data.duration} days`
-      document.getElementById("trip-start").innerHTML = `${data.daysToTrip} days from now`
-      document.getElementById("days_left").innerHTML = `${data.temp}°F`
-      document.getElementById("weather_desc").innerHTML = `${data.description}`
-    } catch (error) {
-      console.log("error", error);
-    }
-  };
-  
-  
-  
